@@ -1,26 +1,137 @@
+/* Hallmark · genre: editorial · macrostructure: Photographic · theme: custom "espresso & candlelight"
+ * paper oklch(17% 0.015 55) · accent oklch(76% 0.13 68) amber · Fraunces (SOFT) + Geist
+ * axes: dark / high-contrast-serif / warm · nav: N9 edge-aligned · footer: Ft1 mast-headed
+ */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: oklch(17% 0.015 55);
+  --color-paper-2: oklch(21% 0.018 55);
+  --color-paper-3: oklch(26% 0.02 55);
+  --color-rule: oklch(34% 0.02 60);
+  --color-muted: oklch(74% 0.02 72);
+  --color-ink: oklch(94% 0.02 80);
+  --color-accent: oklch(76% 0.13 68);
+  --color-focus: oklch(82% 0.14 72);
+  --color-error: oklch(72% 0.15 30);
+  --color-scrim: oklch(12% 0.015 55);
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  overflow-x: clip;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* the one orchestrated entrance: hero copy rises in on load */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.rise {
+  animation: rise 900ms var(--ease-out) both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+.fade {
+  animation: fade 400ms var(--ease-out) both;
+}
+
+/* scroll-driven reveals: native CSS, no JS. Browsers without support just show content as-is */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+}
+@keyframes drift {
+  from {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+    .drift {
+      animation: drift linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+
+/* "A day at NOIR" carousel: the track holds the list twice, so -50% loops seamlessly */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 70s linear infinite;
+}
+.marquee-wrap:hover .marquee,
+.marquee-wrap:focus-within .marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+  .marquee-wrap {
+    overflow-x: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rise,
+  .fade {
+    animation: fade 150ms linear both;
+  }
+}
+
+/* Google Maps has no dark theme for embeds: tone it to the espresso palette */
+.map-dark {
+  filter: grayscale(1) invert(0.92) sepia(0.35) contrast(0.9);
 }
